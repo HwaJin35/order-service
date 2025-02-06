@@ -1,0 +1,56 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.2'
+	id 'io.spring.dependency-management' version '1.1.7'
+//	id 'org.flywaydb.flyway' version '10.0.0'		// 마이그레이션 되돌리기 할 때 플라이웨이 플러그인 설치필요
+}
+
+group = 'com.polarbookshop'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+// 마이그레이션 되돌리기 할 때 필요(./gradlew flywayRepair)
+/*
+flyway {
+    url = 'jdbc:postgresql://localhost:5432/polardb_order'  // DB URL
+    user = 'user'  // DB 사용자명
+    password = 'password'  // DB 비밀번호
+}
+*/
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	// 스프링 웹플럭스를 통해 리액티브 웹 애플리케이션 구축 라이브러리 제공. 네티를 기본 임베디드 서버로 포함.
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.flywaydb:flyway-database-postgresql' //Flyway 10.x 버전 이상부터는 의존성 추가 시 사용 데이터베이스 명을 명시하여야 함
+	
+	// 애플리케이션이 PostgreSQL 데이터베이스에 리액티브 방식으로 연결할 수 있게 해주는 R2DBC 드라이버 제공
+	runtimeOnly 'org.postgresql:r2dbc-postgresql'
+	runtimeOnly 'org.flywaydb:flyway-core'		// 마이그레이션을 통 데이터베이스 버전 관리 기능 제공
+	runtimeOnly 'org.postgresql:postgresql'		// 애플리케이션이 PostgreSQL 데이터베이스에 연결할 수 있게 해주는 JDBC 드라이버.
+	runtimeOnly 'org.springframework:spring-jdbc'	// JDBC API와 스프링의 통합을 제공. 스프링 데이터 JDBC와 혼동 주의.
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	// 리액터 테스트: 프로젝트 리액터 기반으로 작성된 리액티브 애플리케이션을 테스트하기 위한 유틸리티 제공.
+	testImplementation 'io.projectreactor:reactor-test'
+	// 테스트 컨테이너: 경량 도커 컨테이너를 사용해 애플리케이션을 테스트하기 위한 라이브러리 제공
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:postgresql'
+	// R2DBC 드라이버를 지원하는 PostgreSQL용 테스트 컨테이
+	testImplementation 'org.testcontainers:r2dbc'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
